@@ -89,7 +89,12 @@ func InitBrowser(chromiumPath string, extraHeaders map[string]interface{}, proxy
 
 	// https://github.com/chromedp/chromedp/issues/824#issuecomment-845664441
 	// 如果需要在一个浏览器上创建多个tab，则需要先创建浏览器的上下文，即运行下面的语句
-	err := chromedp.Run(bctx, storage.SetCookies(cookies))
+	var err error
+	if cookies != nil {
+		err = chromedp.Run(bctx, storage.SetCookies(cookies))
+	} else {
+		err = chromedp.Run(bctx)
+	}
 	if err != nil {
 		// not found chrome process need exit
 		logger.Logger.Fatal("chromedp run error: ", err.Error())

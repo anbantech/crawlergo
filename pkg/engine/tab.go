@@ -174,17 +174,19 @@ func (tab *Tab) Start() {
 	var outerpage string
 	// 判断是否爬取该tab
 
-	if err := chromedp.Run(*tab.Ctx, chromedp.Tasks{
-		chromedp.Navigate(tab.NavigateReq.URL.String()),
-		chromedp.OuterHTML("html", &outerpage),
-	}); err != nil {
-		panic(err)
-	}
-	tab.ResponsePage = outerpage
-	if is_ignore_response := IsIgnoredByResponseKeywordMatch(tab.config.IgnoreResponseKeywords, outerpage, tab.NavigateReq.URL.String()); is_ignore_response {
-		data.ExcludeReqlist = append(data.ExcludeReqlist, tab.NavigateReq.URL.String())
-		tab.DeleteResultUrl()
-		return
+	if tab.config.IgnoreResponseKeywords != nil {
+		if err := chromedp.Run(*tab.Ctx, chromedp.Tasks{
+			chromedp.Navigate(tab.NavigateReq.URL.String()),
+			chromedp.OuterHTML("html", &outerpage),
+		}); err != nil {
+			panic(err)
+		}
+		tab.ResponsePage = outerpage
+		if is_ignore_response := IsIgnoredByResponseKeywordMatch(tab.config.IgnoreResponseKeywords, outerpage, tab.NavigateReq.URL.String()); is_ignore_response {
+			data.ExcludeReqlist = append(data.ExcludeReqlist, tab.NavigateReq.URL.String())
+			tab.DeleteResultUrl()
+			return
+		}
 	}
 
 	logger.Logger.Info("Crawling " + tab.NavigateReq.Method + " " + tab.NavigateReq.URL.String())
