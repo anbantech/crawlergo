@@ -10,3 +10,5 @@ pkg/mod
 pkg/sumdb
 flag
 main.go
+go.sum
+test.json
