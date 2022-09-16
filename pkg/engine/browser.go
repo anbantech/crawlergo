@@ -76,14 +76,15 @@ func InitBrowser(chromiumPath string, extraHeaders map[string]interface{}, proxy
 	if cookievalue, ok := extraHeaders["Cookie"]; ok {
 		cookievalue := cookievalue.(string)
 		cookielist := strings.Split(cookievalue, ";")
-		var mapcookie network.CookieParam
+
 		for indexi := range cookielist {
 			cookiekv := strings.Split(cookielist[indexi], "=")
+			var mapcookie network.CookieParam
 			mapcookie.Name = strings.TrimSpace(cookiekv[0])
 			mapcookie.Value = cookiekv[1]
 			mapcookie.Domain = data.Domain
+			cookies = append(cookies, &mapcookie)
 		}
-		cookies = append(cookies, &mapcookie)
 
 	}
 

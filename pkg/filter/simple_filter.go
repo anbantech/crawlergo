@@ -93,6 +93,11 @@ func (s *SimpleFilter) RequestFilter(req *model.Request) bool {
 		}
 		return true
 	}()
+	for num := range config.DefaultIgnoreKeywords {
+		if strings.Contains(req.URL.String(), config.DefaultIgnoreKeywords[num]) {
+			return false
+		}
+	}
 	res, err := requests.Get(req.URL.String(), tools.ConvertHeaders(req.Headers),
 		&requests.ReqOptions{AllowRedirect: false,
 			Timeout: 5,
