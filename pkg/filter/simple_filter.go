@@ -26,7 +26,8 @@ func init() {
 	}
 }
 
-/**
+/*
+*
 需要过滤则返回 true
 */
 func (s *SimpleFilter) DoFilter(req *model.Request) bool {
@@ -52,7 +53,8 @@ func (s *SimpleFilter) DoFilter(req *model.Request) bool {
 	return false
 }
 
-/**
+/*
+*
 请求去重
 */
 func (s *SimpleFilter) UniqueFilter(req *model.Request) bool {
@@ -67,7 +69,8 @@ func (s *SimpleFilter) UniqueFilter(req *model.Request) bool {
 	}
 }
 
-/**
+/*
+*
 静态资源过滤
 */
 func (s *SimpleFilter) StaticFilter(req *model.Request) bool {
@@ -85,7 +88,7 @@ func (s *SimpleFilter) StaticFilter(req *model.Request) bool {
 	return false
 }
 
-//过滤不符合条件的请求
+// 过滤不符合条件的请求
 func (s *SimpleFilter) RequestFilter(req *model.Request) bool {
 	defer func() bool {
 		if r := recover(); r != nil {
@@ -113,7 +116,8 @@ func (s *SimpleFilter) RequestFilter(req *model.Request) bool {
 	return false
 }
 
-/**
+/*
+*
 只保留指定域名的链接
 */
 func (s *SimpleFilter) DomainFilter(req *model.Request) bool {

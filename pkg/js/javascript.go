@@ -2,6 +2,7 @@ package js
 
 import (
 	"fmt"
+
 	"github.com/chromedp/cdproto/cdp"
 )
 
@@ -459,6 +460,33 @@ const FormNodeClickJS = `
 		return false;
 	}
 })(%s)
+`
+
+const ClickAllClickableElementJS = `
+(async function() {
+	let allClickableElements = []; // 获取所有可点击的元素 
+	let elements = document.getElementsByTagName('*'); 
+	for(let i = 0; i < elements.length; i++)
+	{ let element = elements[i]; 
+		// 过滤掉不可点击的元素 
+
+	if(element.onclick || element.tabIndex > 0 || element.href !== undefined || element.role === 'button' || window.getEventListeners(element)["click"] != undefined)
+	{ 
+		console.log(element)
+		allClickableElements.push(element); } 
+	} 
+
+	[].forEach.call(allClickableElements,function(a){a.style.outline="1px solid #"+(~~(Math.random()*(1<<24))).toString(16)})
+	allClickableElements.forEach(function(element) { 
+		if (element.disabled) { return; }
+		else { 
+			try{
+			element.click() }catch(e){
+				return;
+			}
+		}
+	});
+})()
 `
 
 func Snippet(js string, f func(n *cdp.Node) string, sel string, n *cdp.Node, v ...interface{}) string {

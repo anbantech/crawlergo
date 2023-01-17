@@ -78,7 +78,7 @@ func InitBrowser(chromiumPath string, extraHeaders map[string]interface{}, proxy
 		cookielist := strings.Split(cookievalue, ";")
 
 		for indexi := range cookielist {
-			cookiekv := strings.Split(cookielist[indexi], "=")
+			cookiekv := strings.SplitN(cookielist[indexi], "=", 2)
 			var mapcookie network.CookieParam
 			mapcookie.Name = strings.TrimSpace(cookiekv[0])
 			mapcookie.Value = cookiekv[1]

@@ -121,13 +121,15 @@ func NewTab(browser *Browser, navigateReq model2.Request, config TabConfig) *Tab
 				go tab.HandleRedirectionResp(v)
 			}
 		//case *network.EventLoadingFailed:
-		//	logger.Logger.Error("EventLoadingFailed ", v.ErrorText)
+		// logger.Logger.Error("EventLoadingFailed ", v.ErrorText)
 		// 401 407 要求认证 此时会阻塞当前页面 需要处理解决
 		case *fetch.EventAuthRequired:
 			tab.WG.Add(1)
 			go tab.HandleAuthRequired(v)
 
-		// DOMContentLoaded
+		// DOMContentLoaded事件是一种在浏览器中触发的事件,当页面的初始 HTML 加载完毕，且解析完毕时触发。
+		// 这意味着浏览器已经可以开始渲染页面了，但外部资源（如图像、样式表和脚本）可能尚未加载完毕。
+		// 这个事件通常用于在页面加载完成后执行一些初始化操作。例如，可以在 DOMContentLoaded 事件触发后绑定事件处理程序，或者在页面加载完成后执行某些初始化脚本。
 		// 开始执行表单填充 和 执行DOM节点观察函数
 		// 只执行一次
 		case *page.EventDomContentEventFired:
@@ -138,6 +140,8 @@ func NewTab(browser *Browser, navigateReq model2.Request, config TabConfig) *Tab
 			tab.WG.Add(1)
 			go tab.AfterDOMRun()
 		// Loaded
+		// 当 Web 浏览器中的页面触发 load 事件时发出。load 事件在整个页面（HTML、CSS、图像等）完成加载时触发。
+		// 这个事件通常用于在页面完全加载后执行任务，例如截取屏幕截图或运行初始化脚本。
 		case *page.EventLoadEventFired:
 			if DOMContentLoadedRun {
 				return
@@ -265,7 +269,8 @@ func RunWithTimeOut(ctx *context.Context, timeout time.Duration, tasks chromedp.
 	}
 }
 
-/**
+/*
+*
 添加收集到的URL到结果列表，需要处理Host绑定
 */
 func (tab *Tab) AddResultUrl(method string, _url string, source string) {
@@ -316,7 +321,8 @@ func (tab *Tab) DeleteResultUrl() {
 	}
 }
 
-/**
+/*
+*
 添加请求到结果列表，拦截请求时处理了Host绑定，此处无需处理
 */
 func (tab *Tab) AddResultRequest(req model2.Request) {
@@ -328,7 +334,8 @@ func (tab *Tab) AddResultRequest(req model2.Request) {
 	tab.lock.Unlock()
 }
 
-/**
+/*
+*
 获取当前标签页CDP的执行上下文
 */
 func (tab *Tab) GetExecutor() context.Context {
@@ -337,7 +344,8 @@ func (tab *Tab) GetExecutor() context.Context {
 	return ctx
 }
 
-/**
+/*
+*
 关闭弹窗
 */
 func (tab *Tab) dismissDialog() {
@@ -346,7 +354,8 @@ func (tab *Tab) dismissDialog() {
 	_ = page.HandleJavaScriptDialog(false).Do(ctx)
 }
 
-/**
+/*
+*
 处理回调
 */
 func (tab *Tab) HandleBindingCalled(event *runtime.EventBindingCalled) {
@@ -363,12 +372,13 @@ func (tab *Tab) HandleBindingCalled(event *runtime.EventBindingCalled) {
 	tab.Evaluate(fmt.Sprintf(js.DeliverResultJS, bcPayload.Name, bcPayload.Seq, "s"))
 }
 
-/**
+/*
+*
 执行JS
 */
 func (tab *Tab) Evaluate(expression string) {
 	ctx := tab.GetExecutor()
-	tCtx, cancel := context.WithTimeout(ctx, time.Second*5)
+	tCtx, cancel := context.WithTimeout(ctx, time.Second*100)
 	defer cancel()
 	_, exception, err := runtime.Evaluate(expression).Do(tCtx)
 	if exception != nil {
@@ -379,7 +389,8 @@ func (tab *Tab) Evaluate(expression string) {
 	}
 }
 
-/**
+/*
+*
 立即根据条件获取Nodes的ID，不等待
 */
 func (tab *Tab) GetNodeIDs(sel string) ([]cdp.NodeID, error) {
@@ -387,7 +398,8 @@ func (tab *Tab) GetNodeIDs(sel string) ([]cdp.NodeID, error) {
 	return dom.QuerySelectorAll(tab.DocBodyNodeId, sel).Do(ctx)
 }
 
-/**
+/*
+*
 根据给的Node执行JS
 */
 func (tab *Tab) EvaluateWithNode(expression string, node *cdp.Node) error {
@@ -400,7 +412,8 @@ func (tab *Tab) EvaluateWithNode(expression string, node *cdp.Node) error {
 	return nil
 }
 
-/**
+/*
+*
 识别页面的编码
 */
 func (tab *Tab) DetectCharset() {
